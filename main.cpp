@@ -15,12 +15,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <ft2build.h>
+#include  <cstdlib>
+#include  <ctime>
 #include FT_FREETYPE_H
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 using namespace std;
-
 GLuint gProgram[4];
 GLint gIntensityLoc;
 float gIntensity = 1000;
@@ -711,7 +712,7 @@ void ParseCommandLineArguments(int argc, char *argv[], string &objFileName)
 }
 
 void constructColorArray(){
-
+    srand(time(NULL));
     std::vector<std::vector<glm::vec3>> temp(grid_width, std::vector<glm::vec3>(grid_height));
     for (int i = 0; i < grid_width; i++) {
         for (int j = 0; j < grid_height; j++) {
