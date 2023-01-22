@@ -566,11 +566,36 @@ void renderText(const std::string &text, GLfloat x, GLfloat y, GLfloat scale, gl
 
     glBindTexture(GL_TEXTURE_2D, 0);
 }
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    {
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+        ypos = height - ypos;
+
+        // Normalize the mouse position
+        float norm_x = (xpos / width) * 20.0f - 10.0f;
+        float norm_y = (ypos / height) * 20.0f - 10.0f;
+
+        int grid_x = (norm_x + 10.0f) / (18.0f / grid_width);
+        int grid_y = (norm_y + 10.0f) / (18.0f / grid_height);
+
+        if (grid_x >= 0 && grid_x < grid_width && grid_y >= 0 && grid_y < grid_height)
+        {
+            int clicked_object_index = grid_y * grid_width + grid_x;
+            std::cout << "Clicked object x: " << grid_x << std::endl;
+            std::cout << "Clicked object y: " << grid_y << std::endl;
+        }
+    }
+}
 
 void display(GLFWwindow *window)
 {
 
-    float aspect_ratio = min(1.0f * (4.0f / grid_width), 1.0f * (4.0f / grid_width));
+    float aspect_ratio = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_width));
 
     glClearColor(0, 0, 0, 1);
     glClearDepth(1.0f);
@@ -578,7 +603,7 @@ void display(GLFWwindow *window)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     static float angle = 0;
-    glUseProgram(gProgram[1]);
+    glUseProgram(gProgram[0]);
 
     for (int i = 0; i < grid_width; i++)
     {
@@ -587,14 +612,15 @@ void display(GLFWwindow *window)
 
             glm::mat4 T = glm::translate(glm::mat4(1.f), glm::vec3((i) * (18. / grid_width) - 10 + 1 + (18. / ((2) * (grid_width))), 10 - j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height)), -10.f));
             glm::mat4 R = glm::rotate(glm::mat4(1.f), glm::radians(angle), glm::vec3(0, 1, 0));
-            glm::mat4 S = glm::scale(glm::mat4(1.f), glm::vec3(aspect_ratio / 1.5, aspect_ratio / 1.5, aspect_ratio / 1.5));
+            glm::mat4 S = glm::scale(glm::mat4(1.f), glm::vec3(aspect_ratio / 2, aspect_ratio / 2, aspect_ratio / 2));
+
             glm::mat4 modelMat = T * R * S;
             glm::mat4 modelMatInv = glm::transpose(glm::inverse(modelMat));
             glm::mat4 projectionMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -20.0f, 20.0f);
 
-            glUniformMatrix4fv(glGetUniformLocation(gProgram[1], "modelingMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
-            glUniformMatrix4fv(glGetUniformLocation(gProgram[1], "modelingMatInvTr"), 1, GL_FALSE, glm::value_ptr(modelMatInv));
-            glUniformMatrix4fv(glGetUniformLocation(gProgram[1], "orthoMat"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+            glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "modelingMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
+            glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "modelingMatInvTr"), 1, GL_FALSE, glm::value_ptr(modelMatInv));
+            glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "orthoMat"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
             drawModel();
         }
     }
@@ -692,7 +718,7 @@ int main(int argc, char **argv) // Create Main Function For Bringing It All Toge
     // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     window = glfwCreateWindow(gWidth, gHeight, "Simple Example", NULL, NULL);
-
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
     if (!window)
     {
         glfwTerminate();
