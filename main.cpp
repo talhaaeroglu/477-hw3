@@ -33,6 +33,7 @@ glm::vec3 colorArray[5] = {
     glm::vec3(0.1, 0.1, 0.8),
     glm::vec3(0.9, 0.1, 0.1),
 };
+std::vector<std::vector<glm::vec3>> colorGrid;
 struct Vertex
 {
     Vertex(GLfloat inX, GLfloat inY, GLfloat inZ) : x(inX), y(inY), z(inZ) {}
@@ -620,10 +621,10 @@ void display(GLFWwindow *window)
             glm::mat4 T = glm::translate(glm::mat4(1.f), glm::vec3((i) * (18. / grid_width) - 10 + 1 + (18. / ((2) * (grid_width))), 10 - j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height)), -10.f));
             glm::mat4 R = glm::rotate(glm::mat4(1.f), glm::radians(angle), glm::vec3(0, 1, 0));
             glm::mat4 S = glm::scale(glm::mat4(1.f), glm::vec3(aspect_ratio / 2, aspect_ratio / 2, aspect_ratio / 2));
-            glm::vec3 color = colorArray[rand() % 5];
             glm::mat4 modelMat = T * R * S;
             glm::mat4 modelMatInv = glm::transpose(glm::inverse(modelMat));
             glm::mat4 projectionMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -20.0f, 20.0f);
+            glm::vec3 color = colorGrid[i][j];
 
             glUniform3f(glGetUniformLocation(gProgram[0], "kd"), color.x, color.y, color.z);
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "modelingMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
@@ -709,11 +710,24 @@ void ParseCommandLineArguments(int argc, char *argv[], string &objFileName)
     objFileName = argv[3];
 }
 
+void constructColorArray(){
+
+    std::vector<std::vector<glm::vec3>> temp(grid_width, std::vector<glm::vec3>(grid_height));
+    for (int i = 0; i < grid_width; i++) {
+        for (int j = 0; j < grid_height; j++) {
+            glm::vec3 color = colorArray[rand() % 5];
+            temp[i][j] = color;
+        }
+    }
+
+    colorGrid = temp;
+}
 int main(int argc, char **argv) // Create Main Function For Bringing It All Together
 {
 
     string objFileName;
     ParseCommandLineArguments(argc, argv, objFileName);
+    constructColorArray();
     GLFWwindow *window;
     if (!glfwInit())
     {
