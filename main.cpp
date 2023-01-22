@@ -25,7 +25,7 @@ GLuint gProgram[4];
 GLint gIntensityLoc;
 float gIntensity = 1000;
 int gWidth = 640, gHeight = 480;
-
+int grid_width, grid_height;
 struct Vertex
 {
     Vertex(GLfloat inX, GLfloat inY, GLfloat inZ) : x(inX), y(inY), z(inZ) {}
@@ -498,11 +498,10 @@ void initFonts(int windowWidth, int windowHeight)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void init()
+void init(string objFileName)
 {
     // ParseObj("armadillo.obj");
-    ParseObj("bunny.obj");
-
+    ParseObj(objFileName);
     glEnable(GL_DEPTH_TEST);
     initShaders();
     initFonts(gWidth, gHeight);
@@ -570,14 +569,8 @@ void renderText(const std::string &text, GLfloat x, GLfloat y, GLfloat scale, gl
 
 void display(GLFWwindow *window)
 {
-    int grid_x = 5;
-    int grid_y = 5;
-    float x, y, object_size_x, object_size_y;
-    int window_width, window_height;
+
     float aspect_ratio = 1. * gHeight / gWidth;
-    glfwGetWindowSize(window, &window_width, &window_height);
-    object_size_x = (float)window_width / grid_x;
-    object_size_y = (float)window_height / grid_y;
 
     glClearColor(0, 0, 0, 1);
     glClearDepth(1.0f);
@@ -587,12 +580,12 @@ void display(GLFWwindow *window)
     static float angle = 0;
     glUseProgram(gProgram[1]);
 
-    for (int i = 0; i < grid_y; i++)
+    for (int i = 0; i < grid_height; i++)
     {
-        for (int j = 0; j < grid_x; j++)
+        for (int j = 0; j < grid_width; j++)
         {
 
-            glm::mat4 T = glm::translate(glm::mat4(1.f), glm::vec3((i) * (20. / grid_x) - 10 + 1.5, 10 - j * (20. / grid_y) - 1.5, -10.f));
+            glm::mat4 T = glm::translate(glm::mat4(1.f), glm::vec3((i) * (20. / grid_width) - 10 + 1.5, 10 - j * (20. / grid_height) - 1.5, -10.f));
             glm::mat4 R = glm::rotate(glm::mat4(1.f), glm::radians(angle), glm::vec3(0, 1, 0));
             glm::mat4 S = glm::scale(glm::mat4(1.f), glm::vec3(aspect_ratio / 2, aspect_ratio / 2, aspect_ratio / 2));
             glm::mat4 modelMat = T * R * S;
@@ -669,9 +662,24 @@ void mainLoop(GLFWwindow *window)
         glfwPollEvents();
     }
 }
+void ParseCommandLineArguments(int argc, char *argv[], string &objFileName)
+{
+    if (argc != 4)
+    {
+        cout << "Usage: " << argv[0] << "gridWidth gridHeight obj" << endl;
+        exit(1);
+    }
+
+    grid_width = atoi(argv[1]);
+    grid_height = atoi(argv[2]);
+    objFileName = argv[3];
+}
 
 int main(int argc, char **argv) // Create Main Function For Bringing It All Together
 {
+
+    string objFileName;
+    ParseCommandLineArguments(argc, argv, objFileName);
     GLFWwindow *window;
     if (!glfwInit())
     {
@@ -707,7 +715,7 @@ int main(int argc, char **argv) // Create Main Function For Bringing It All Toge
     strcat(rendererInfo, (const char *)glGetString(GL_VERSION));
     glfwSetWindowTitle(window, rendererInfo);
 
-    init();
+    init(objFileName);
 
     glfwSetKeyCallback(window, keyboard);
     glfwSetWindowSizeCallback(window, reshape);
