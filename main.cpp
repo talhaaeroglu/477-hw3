@@ -34,7 +34,13 @@ glm::vec3 colorArray[5] = {
     glm::vec3(0.1, 0.1, 0.8),
     glm::vec3(0.9, 0.1, 0.1),
 };
-std::vector<std::vector<glm::vec3>> colorGrid;
+
+struct Fistik
+{
+    glm::vec3 color;
+    bool isClicked = false;
+};
+
 struct Vertex
 {
     Vertex(GLfloat inX, GLfloat inY, GLfloat inZ) : x(inX), y(inY), z(inZ) {}
@@ -69,6 +75,8 @@ struct Face
     }
     GLuint vIndex[3], tIndex[3], nIndex[3];
 };
+
+std::vector<std::vector<Fistik>> colorGrid;
 
 vector<Vertex> gVertices;
 vector<Texture> gTextures;
@@ -625,7 +633,7 @@ void display(GLFWwindow *window)
             glm::mat4 modelMat = T * R * S;
             glm::mat4 modelMatInv = glm::transpose(glm::inverse(modelMat));
             glm::mat4 projectionMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -20.0f, 20.0f);
-            glm::vec3 color = colorGrid[i][j];
+            glm::vec3 color = colorGrid[i][j].color;
 
             glUniform3f(glGetUniformLocation(gProgram[0], "kd"), color.x, color.y, color.z);
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "modelingMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
@@ -713,11 +721,11 @@ void ParseCommandLineArguments(int argc, char *argv[], string &objFileName)
 
 void constructColorArray(){
     srand(time(NULL));
-    std::vector<std::vector<glm::vec3>> temp(grid_width, std::vector<glm::vec3>(grid_height));
+    std::vector<std::vector<Fistik>> temp(grid_width, std::vector<Fistik>(grid_height));
     for (int i = 0; i < grid_width; i++) {
         for (int j = 0; j < grid_height; j++) {
             glm::vec3 color = colorArray[rand() % 5];
-            temp[i][j] = color;
+            temp[i][j].color = color;
         }
     }
 
