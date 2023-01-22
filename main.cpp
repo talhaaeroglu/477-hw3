@@ -570,7 +570,7 @@ void renderText(const std::string &text, GLfloat x, GLfloat y, GLfloat scale, gl
 void display(GLFWwindow *window)
 {
 
-    float aspect_ratio = 1. * gHeight / gWidth;
+    float aspect_ratio = min(1.0f * (5.0f / grid_width) , 1.0f * (5.0f / grid_width)) ;
 
     glClearColor(0, 0, 0, 1);
     glClearDepth(1.0f);
