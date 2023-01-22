@@ -15,8 +15,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <ft2build.h>
-#include  <cstdlib>
-#include  <ctime>
+#include <cstdlib>
+#include <ctime>
 #include FT_FREETYPE_H
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -39,6 +39,7 @@ struct Fistik
 {
     glm::vec3 color;
     bool isClicked = false;
+    float scaleFactor = 0;
 };
 
 struct Vertex
@@ -596,13 +597,15 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
         // Normalize the mouse position
         float norm_x = (xpos / width) * 20.0f - 10.0f;
         float norm_y = (ypos / height) * 20.0f - 10.0f;
+        // std::cout << "norm_x : " << norm_x << std::endl;
+        // std::cout << "norm_y : " << norm_y << std::endl;
 
         int grid_x = (norm_x + 10.0f) / (18.0f / grid_width);
         int grid_y = (10.0f - norm_y) / (18.0f / grid_height);
 
-        if (norm_x > -9 && norm_x < 9 && norm_y > -9 && norm_y < 9)
+        if (norm_x > -9 && norm_x < 9 && norm_y > -9 && norm_y < 9 && grid_x < grid_width && grid_y < grid_height)
         {
-            int clicked_object_index = grid_y * grid_width + grid_x;
+            colorGrid[grid_x][grid_y].isClicked = true;
             std::cout << "Clicked object x: " << grid_x << std::endl;
             std::cout << "Clicked object y: " << grid_y << std::endl;
         }
@@ -612,7 +615,7 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 void display(GLFWwindow *window)
 {
 
-    float aspect_ratio = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_width));
+    float scale = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2;
 
     glClearColor(0, 0, 0, 1);
     glClearDepth(1.0f);
@@ -626,10 +629,13 @@ void display(GLFWwindow *window)
     {
         for (int j = 0; j < grid_height; j++)
         {
-
+            if (colorGrid[i][j].isClicked == true && colorGrid[i][j].scaleFactor < (1.5 * scale))
+            {
+                colorGrid[i][j].scaleFactor += 0.01;
+            }
             glm::mat4 T = glm::translate(glm::mat4(1.f), glm::vec3((i) * (18. / grid_width) - 10 + 1 + (18. / ((2) * (grid_width))), 10 - j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height)), -10.f));
             glm::mat4 R = glm::rotate(glm::mat4(1.f), glm::radians(angle), glm::vec3(0, 1, 0));
-            glm::mat4 S = glm::scale(glm::mat4(1.f), glm::vec3(aspect_ratio / 2, aspect_ratio / 2, aspect_ratio / 2));
+            glm::mat4 S = glm::scale(glm::mat4(1.f), glm::vec3(colorGrid[i][j].scaleFactor, colorGrid[i][j].scaleFactor, colorGrid[i][j].scaleFactor));
             glm::mat4 modelMat = T * R * S;
             glm::mat4 modelMatInv = glm::transpose(glm::inverse(modelMat));
             glm::mat4 projectionMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -20.0f, 20.0f);
@@ -639,7 +645,8 @@ void display(GLFWwindow *window)
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "modelingMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "modelingMatInvTr"), 1, GL_FALSE, glm::value_ptr(modelMatInv));
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "orthoMat"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-            drawModel();
+            if (!(colorGrid[i][j].isClicked == true && colorGrid[i][j].scaleFactor >= (1.5 * scale)))
+                drawModel();
         }
     }
 
@@ -719,13 +726,19 @@ void ParseCommandLineArguments(int argc, char *argv[], string &objFileName)
     objFileName = argv[3];
 }
 
-void constructColorArray(){
+void constructColorArray()
+{
     srand(time(NULL));
+    float scaleFactor = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2.;
+    cout << "test: " << scaleFactor << endl;
     std::vector<std::vector<Fistik>> temp(grid_width, std::vector<Fistik>(grid_height));
-    for (int i = 0; i < grid_width; i++) {
-        for (int j = 0; j < grid_height; j++) {
+    for (int i = 0; i < grid_width; i++)
+    {
+        for (int j = 0; j < grid_height; j++)
+        {
             glm::vec3 color = colorArray[rand() % 5];
             temp[i][j].color = color;
+            temp[i][j].scaleFactor = scaleFactor;
         }
     }
 
