@@ -5,7 +5,7 @@ attribute vec3 inNormal;
 
 uniform mat4 modelingMat;
 uniform mat4 modelingMatInvTr;
-uniform mat4 perspectiveMat;
+uniform mat4 orthoMat;
 
 varying vec4 fragPos;
 varying vec3 N;
@@ -19,6 +19,6 @@ void main(void)
 	N = normalize(Nw);
 	fragPos = p;
 
-    gl_Position = perspectiveMat * modelingMat * vec4(inVertex, 1);
+    gl_Position = orthoMat * modelingMat * vec4(inVertex, 1);
 }
 
