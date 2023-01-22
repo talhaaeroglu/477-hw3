@@ -580,12 +580,12 @@ void display(GLFWwindow *window)
     static float angle = 0;
     glUseProgram(gProgram[1]);
 
-    for (int i = 0; i < grid_height; i++)
+    for (int i = 0; i < grid_width; i++)
     {
-        for (int j = 0; j < grid_width; j++)
+        for (int j = 0; j < grid_height; j++)
         {
 
-            glm::mat4 T = glm::translate(glm::mat4(1.f), glm::vec3((i) * (20. / grid_width) - 10 + 1.5, 10 - j * (20. / grid_height) - 1.5, -10.f));
+            glm::mat4 T = glm::translate(glm::mat4(1.f), glm::vec3((i) * (18. / grid_width) - 10 + 1 + (18. / ((2) * (grid_width))), 10 - j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height)), -10.f));
             glm::mat4 R = glm::rotate(glm::mat4(1.f), glm::radians(angle), glm::vec3(0, 1, 0));
             glm::mat4 S = glm::scale(glm::mat4(1.f), glm::vec3(aspect_ratio / 2, aspect_ratio / 2, aspect_ratio / 2));
             glm::mat4 modelMat = T * R * S;
