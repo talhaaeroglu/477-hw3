@@ -570,7 +570,7 @@ void renderText(const std::string &text, GLfloat x, GLfloat y, GLfloat scale, gl
 void display(GLFWwindow *window)
 {
 
-    float aspect_ratio = min(1.0f * (5.0f / grid_width) , 1.0f * (5.0f / grid_width)) ;
+    float aspect_ratio = min(1.0f * (4.0f / grid_width), 1.0f * (4.0f / grid_width));
 
     glClearColor(0, 0, 0, 1);
     glClearDepth(1.0f);
@@ -587,7 +587,7 @@ void display(GLFWwindow *window)
 
             glm::mat4 T = glm::translate(glm::mat4(1.f), glm::vec3((i) * (18. / grid_width) - 10 + 1 + (18. / ((2) * (grid_width))), 10 - j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height)), -10.f));
             glm::mat4 R = glm::rotate(glm::mat4(1.f), glm::radians(angle), glm::vec3(0, 1, 0));
-            glm::mat4 S = glm::scale(glm::mat4(1.f), glm::vec3(aspect_ratio / 2, aspect_ratio / 2, aspect_ratio / 2));
+            glm::mat4 S = glm::scale(glm::mat4(1.f), glm::vec3(aspect_ratio / 1.5, aspect_ratio / 1.5, aspect_ratio / 1.5));
             glm::mat4 modelMat = T * R * S;
             glm::mat4 modelMatInv = glm::transpose(glm::inverse(modelMat));
             glm::mat4 projectionMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -20.0f, 20.0f);
