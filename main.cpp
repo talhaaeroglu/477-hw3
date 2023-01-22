@@ -26,6 +26,13 @@ GLint gIntensityLoc;
 float gIntensity = 1000;
 int gWidth = 640, gHeight = 480;
 int grid_width, grid_height;
+glm::vec3 colorArray[5] = {
+    glm::vec3(0.7, 0, 0.2),
+    glm::vec3(0.1, 0.8, 0.1),
+    glm::vec3(0.1, 0.8, 0.8),
+    glm::vec3(0.1, 0.1, 0.8),
+    glm::vec3(0.9, 0.1, 0.1),
+};
 struct Vertex
 {
     Vertex(GLfloat inX, GLfloat inY, GLfloat inZ) : x(inX), y(inY), z(inZ) {}
@@ -581,9 +588,9 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
         float norm_y = (ypos / height) * 20.0f - 10.0f;
 
         int grid_x = (norm_x + 10.0f) / (18.0f / grid_width);
-        int grid_y = (norm_y + 10.0f) / (18.0f / grid_height);
+        int grid_y = (10.0f - norm_y) / (18.0f / grid_height);
 
-        if (grid_x >= 0 && grid_x < grid_width && grid_y >= 0 && grid_y < grid_height)
+        if (norm_x > -9 && norm_x < 9 && norm_y > -9 && norm_y < 9)
         {
             int clicked_object_index = grid_y * grid_width + grid_x;
             std::cout << "Clicked object x: " << grid_x << std::endl;
@@ -613,11 +620,12 @@ void display(GLFWwindow *window)
             glm::mat4 T = glm::translate(glm::mat4(1.f), glm::vec3((i) * (18. / grid_width) - 10 + 1 + (18. / ((2) * (grid_width))), 10 - j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height)), -10.f));
             glm::mat4 R = glm::rotate(glm::mat4(1.f), glm::radians(angle), glm::vec3(0, 1, 0));
             glm::mat4 S = glm::scale(glm::mat4(1.f), glm::vec3(aspect_ratio / 2, aspect_ratio / 2, aspect_ratio / 2));
-
+            glm::vec3 color = colorArray[rand() % 5];
             glm::mat4 modelMat = T * R * S;
             glm::mat4 modelMatInv = glm::transpose(glm::inverse(modelMat));
             glm::mat4 projectionMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -20.0f, 20.0f);
 
+            glUniform3f(glGetUniformLocation(gProgram[0], "kd"), color.x, color.y, color.z);
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "modelingMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "modelingMatInvTr"), 1, GL_FALSE, glm::value_ptr(modelMatInv));
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "orthoMat"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));

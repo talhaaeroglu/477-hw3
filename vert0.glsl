@@ -7,7 +7,7 @@ uniform float intensity;
 vec3 I = vec3(intensity, intensity, intensity);
 vec3 Iamb = vec3(0.8, 0.8, 0.8);
 
-vec3 kd = vec3(0.7, 0, 0.2);
+uniform vec3 kd;
 vec3 ka = vec3(0.1, 0.1, 0.1);
 vec3 ks = vec3(0.8, 0.8, 0.8);
 
