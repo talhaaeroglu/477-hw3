@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <stack>
 #include <map>
 #include <fstream>
 #include <iostream>
@@ -38,8 +39,16 @@ glm::vec3 colorArray[5] = {
 struct Fistik
 {
     glm::vec3 color;
+    int colorId;
     bool isClicked = false;
+    bool show = true;
     float scaleFactor = 0;
+
+    bool operator == (Fistik &obj) {
+        return (color.x == obj.color.x 
+                && color.y == obj.color.y 
+                && color.z == obj.color.z);
+    }
 };
 
 struct Vertex
@@ -96,6 +105,76 @@ struct Character
     glm::ivec2 Bearing; // Offset from baseline to left/top of glyph
     GLuint Advance;     // Horizontal offset to advance to next glyph
 };
+
+
+void match_and_pop(int i, int j)
+{
+
+    std::stack<std::pair<int,int>> objectsToPop;
+
+
+    // Check Vertical
+    int count = 1;
+    Fistik popObj = colorGrid[i][j];
+    for (int col = j - 1; col >= 0; col--){
+        Fistik currObj = colorGrid[i][col];
+        if (currObj == popObj){
+            count++;
+            objectsToPop.push({i,col});
+        } else
+            break;     
+    }
+
+    for (int col = j + 1; col < grid_height; col++){
+        Fistik currObj =colorGrid[i][col];
+        if (currObj  == popObj){
+            count++;
+            objectsToPop.push({i,col});
+        } else
+            break;
+
+    }
+
+    if(count>=3){
+        while(!objectsToPop.empty()){
+            auto [x,y] = objectsToPop.top();
+            objectsToPop.pop();
+            colorGrid[x][y].isClicked = true;
+        }
+    }
+    // IF COUNT < 2, EMPTY STACK
+    while (!objectsToPop.empty()){
+        objectsToPop.pop();
+    }
+
+    // Check Horizontal
+    count = 1;
+    for (int row = i - 1; row >= 0; row--){
+        Fistik currObj = colorGrid[row][j];
+        if (currObj == popObj){
+            count++;
+            objectsToPop.push({row,j});
+        } else
+            break;
+    }
+
+    for (int row = i + 1; row < grid_width; row++){
+        Fistik currObj =colorGrid[row][j];
+        if (currObj  == popObj){
+            count++;
+            objectsToPop.push({row,j});
+        }else
+            break;
+    }
+
+    if(count>=3){
+        while(!objectsToPop.empty()){
+            auto [x,y] = objectsToPop.top();
+            objectsToPop.pop();
+            colorGrid[x][y].isClicked = true;
+        }
+    }
+}
 
 std::map<GLchar, Character> Characters;
 
@@ -608,6 +687,7 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
             colorGrid[grid_x][grid_y].isClicked = true;
             std::cout << "Clicked object x: " << grid_x << std::endl;
             std::cout << "Clicked object y: " << grid_y << std::endl;
+            match_and_pop(grid_x, grid_y);
         }
     }
 }
@@ -645,7 +725,7 @@ void display(GLFWwindow *window)
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "modelingMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "modelingMatInvTr"), 1, GL_FALSE, glm::value_ptr(modelMatInv));
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "orthoMat"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-            if (!(colorGrid[i][j].isClicked == true && colorGrid[i][j].scaleFactor >= (1.5 * scale)))
+            if ( colorGrid[i][j].show && !(colorGrid[i][j].isClicked && colorGrid[i][j].scaleFactor >= (1.5 * scale)))
                 drawModel();
         }
     }
@@ -669,6 +749,9 @@ void reshape(GLFWwindow *window, int w, int h)
 
     glViewport(0, 0, w, h);
 }
+
+
+
 
 void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
