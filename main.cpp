@@ -17,8 +17,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <ft2build.h>
-#include <cstdlib>
-#include <ctime>
+#include <chrono>
+#include<unistd.h>               // for linux 
 #include FT_FREETYPE_H
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -724,7 +724,9 @@ void updateObjectPosition()
 }
 void addNewObject(int x)
 {
-    srand(time(NULL));
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    srand(seed);
+    cout <<  getpid() << endl;
     float scaleFactor = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2.;
     glm::vec3 color = colorArray[rand() % 5];
     colorGrid[x][0].color = color;
