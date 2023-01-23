@@ -115,7 +115,7 @@ struct ComparePair
 {
     bool operator()(const std::pair<int, int> &p1, const std::pair<int, int> &p2)
     {
-        return p1.second < p2.second;
+        return p1.second > p2.second;
     }
 };
 
@@ -754,7 +754,6 @@ void updateObjectPosition()
         }
     }
 }
-
 void addNewObject(int x, int offset)
 {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -765,7 +764,7 @@ void addNewObject(int x, int offset)
     cout<< "Fistik:" << offset << endl;
 
     //??
-    colorGrid[x][0].yPos = 10 + offset * (18. / grid_height) - 1 - 18. / ((2) * (grid_height)); // start position
+    colorGrid[x][0].yPos = 10 + offset *( 2 *  (18. / grid_height) - 1 - 18. / ((2) * (grid_height))); // start position
     //burası sakat gibi
 
     colorGrid[x][0].isClicked = false;
