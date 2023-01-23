@@ -27,10 +27,14 @@
 using namespace std;
 GLuint gProgram[4];
 GLint gIntensityLoc;
+
 float gIntensity = 1000;
-int gWidth = 640, gHeight = 480;
-bool lockPop = false;
 int grid_width, grid_height;
+int gWidth = 640, gHeight = 480;
+int moves = 0, score = 0;
+bool lockPop = false;
+
+
 glm::vec3 colorArray[5] = {
     glm::vec3(0.7, 0, 0.2),
     glm::vec3(0.1, 0.8, 0.1),
@@ -125,6 +129,7 @@ void match_and_pop(int i, int j)
 
     std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, ComparePair> objectsToPop;
     objectsToPop.push({i, j});
+    bool matched = false;
 
     // Check Vertical
     int count = 1;
@@ -157,7 +162,7 @@ void match_and_pop(int i, int j)
 
         if (count >= 3)
         {
-
+            matched = true;
             int offset = 0;
             while (!objectsToPop.empty())
             {
@@ -168,6 +173,7 @@ void match_and_pop(int i, int j)
                 colorGrid[x][y].yOffset = offset;
                 cout << "MATCH OFFSET: " << offset << endl;
                 ++offset;
+                ++score;
             }
         }
         // IF COUNT < 2, EMPTY STACK
@@ -178,6 +184,8 @@ void match_and_pop(int i, int j)
 
         // Check Horizontal
         count = 1;
+        if(!matched)
+            objectsToPop.push({i, j});
         for (int row = i - 1; row >= 0; row--)
         {
             Fistik currObj = colorGrid[row][j];
@@ -204,16 +212,21 @@ void match_and_pop(int i, int j)
 
         if (count >= 3)
         {
+            matched = true;
             while (!objectsToPop.empty())
             {
                 auto it = objectsToPop.top();
                 int x = it.first, y = it.second;
                 objectsToPop.pop();
                 colorGrid[x][y].isClicked = true;
+                ++score;
             }
         }
-
-        colorGrid[i][j].isClicked = true;
+        if(!matched){
+            colorGrid[i][j].isClicked = true;
+            ++score;
+        }
+        
     }
 }
 
@@ -725,10 +738,10 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 
         if (norm_x > -9 && norm_x < 9 && norm_y > -9 && norm_y < 9 && grid_x < grid_width && grid_y < grid_height)
         {
-
             std::cout << "Clicked object x: " << grid_x << std::endl;
             std::cout << "Clicked object y: " << grid_y << std::endl;
             match_and_pop(grid_x, grid_y);
+            ++moves;
         }
     }
 }
@@ -775,6 +788,7 @@ void addNewObject(int x, int offset)
 
 void display(GLFWwindow *window)
 {
+    cout <<"Score: "<< score << endl;
     updateObjectPosition();
     float scale = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2;
 
