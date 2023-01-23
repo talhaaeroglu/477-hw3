@@ -761,12 +761,7 @@ void addNewObject(int x, int offset)
     float scaleFactor = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2.;
     glm::vec3 color = colorArray[rand() % 5];
     colorGrid[x][0].color = color;
-    cout<< "Fistik:" << offset << endl;
-
-    //??
-    colorGrid[x][0].yPos = 10 + offset *( 2 *  (18. / grid_height) - 1 - 18. / ((2) * (grid_height))); // start position
-    //burası sakat gibi
-
+    colorGrid[x][0].yPos = 10 + offset * (18. / grid_height);
     colorGrid[x][0].isClicked = false;
     colorGrid[x][0].isMoving = true;
     colorGrid[x][0].scaleFactor = scaleFactor;
