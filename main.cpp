@@ -53,11 +53,6 @@ struct Fistik
                 && color.z == obj.color.z);
     }
     int original_j;
-
-    bool operator==(Fistik &obj)
-    {
-        return (color.x == obj.color.x && color.y == obj.color.y && color.z == obj.color.z);
-    }
 };
 
 struct Vertex
