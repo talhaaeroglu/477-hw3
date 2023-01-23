@@ -679,8 +679,8 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
         // std::cout << "norm_x : " << norm_x << std::endl;
         // std::cout << "norm_y : " << norm_y << std::endl;
 
-        int grid_x = (norm_x + 10.0f) / (18.0f / grid_width);
-        int grid_y = (10.0f - norm_y) / (18.0f / grid_height);
+        int grid_x = (norm_x + 9.0f) / (18.0f / grid_width);
+        int grid_y = (9.0f - norm_y) / (18.0f / grid_height);
 
         if (norm_x > -9 && norm_x < 9 && norm_y > -9 && norm_y < 9 && grid_x < grid_width && grid_y < grid_height)
         {
