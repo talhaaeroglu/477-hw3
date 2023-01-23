@@ -143,7 +143,6 @@ void match_and_pop(int i, int j)
             objectsToPop.push({i,col});
         } else
             break;
-
     }
 
     if(count>=3){
@@ -155,6 +154,7 @@ void match_and_pop(int i, int j)
             objectsToPop.pop();
             colorGrid[x][y].isClicked = true;
             colorGrid[x][y].yOffset = offset;
+            cout << "MATCH OFFSET: " << offset << endl;
             ++offset;
         }
     }
@@ -737,15 +737,19 @@ void updateObjectPosition()
         }
     }
 }
-void addNewObject(int x)
+void addNewObject(int x, int offset)
 {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     srand(seed);
-    cout <<  getpid() << endl;
     float scaleFactor = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2.;
     glm::vec3 color = colorArray[rand() % 5];
     colorGrid[x][0].color = color;
-    colorGrid[x][0].yPos = 10; // start position
+    cout<< "Fistik:" << offset << endl;
+
+    //??
+    colorGrid[x][0].yPos = 10 + offset * (18. / grid_height) - 1 - 18. / ((2) * (grid_height)); // start position
+    //burası sakat gibi
+
     colorGrid[x][0].isClicked = false;
     colorGrid[x][0].isMoving = true;
     colorGrid[x][0].scaleFactor = scaleFactor;
@@ -774,9 +778,9 @@ void display(GLFWwindow *window)
             }
             if (colorGrid[i][j].isClicked == true && colorGrid[i][j].scaleFactor >= (1.5 * scale))
             {
-                cout << colorGrid[i][j].yOffset << endl;
+                int offset = colorGrid[i][j].yOffset;
                 moveObjectsDown(i, j);
-                addNewObject(i);
+                addNewObject(i, offset);
                 colorGrid[i][j].isClicked = false;
                 // move down the objects above the empty space
             }
