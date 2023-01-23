@@ -856,37 +856,38 @@ void reshape(GLFWwindow *window, int w, int h)
     glViewport(0, 0, w, h);
 }
 
+void constructColorArray()
+{
+    srand(time(NULL));
+    float scaleFactor = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2.;
+    cout << "test: " << scaleFactor << endl;
+    std::vector<std::vector<Fistik>> temp(grid_width, std::vector<Fistik>(grid_height));
+    for (int i = 0; i < grid_width; i++)
+    {
+        for (int j = 0; j < grid_height; j++)
+        {
+            glm::vec3 color = colorArray[rand() % 5];
+            temp[i][j].color = color;
+            temp[i][j].scaleFactor = scaleFactor;
+            temp[i][j].yPos = 10 - j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height));
+        }
+    }
+
+    colorGrid = temp;
+}
+
 void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
-    else if (key == GLFW_KEY_F && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_R && action == GLFW_PRESS)
     {
-        cout << "F pressed" << endl;
-        glUseProgram(gProgram[1]);
-    }
-    else if (key == GLFW_KEY_V && action == GLFW_PRESS)
-    {
-        cout << "V pressed" << endl;
-        glUseProgram(gProgram[0]);
-    }
-    else if (key == GLFW_KEY_D && action == GLFW_PRESS)
-    {
-        cout << "D pressed" << endl;
-        gIntensity /= 1.5;
-        cout << "gIntensity = " << gIntensity << endl;
-        glUseProgram(gProgram[0]);
-        glUniform1f(gIntensityLoc, gIntensity);
-    }
-    else if (key == GLFW_KEY_B && action == GLFW_PRESS)
-    {
-        cout << "B pressed" << endl;
-        gIntensity *= 1.5;
-        cout << "gIntensity = " << gIntensity << endl;
-        glUseProgram(gProgram[0]);
-        glUniform1f(gIntensityLoc, gIntensity);
+        cout << "R pressed" << endl;
+        moves = 0;
+        score = 0;
+        constructColorArray();
     }
 }
 
@@ -912,25 +913,6 @@ void ParseCommandLineArguments(int argc, char *argv[], string &objFileName)
     objFileName = argv[3];
 }
 
-void constructColorArray()
-{
-    srand(time(NULL));
-    float scaleFactor = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2.;
-    cout << "test: " << scaleFactor << endl;
-    std::vector<std::vector<Fistik>> temp(grid_width, std::vector<Fistik>(grid_height));
-    for (int i = 0; i < grid_width; i++)
-    {
-        for (int j = 0; j < grid_height; j++)
-        {
-            glm::vec3 color = colorArray[rand() % 5];
-            temp[i][j].color = color;
-            temp[i][j].scaleFactor = scaleFactor;
-            temp[i][j].yPos = 10 - j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height));
-        }
-    }
-
-    colorGrid = temp;
-}
 int main(int argc, char **argv) // Create Main Function For Bringing It All Together
 {
 
