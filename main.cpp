@@ -46,6 +46,7 @@ struct Fistik
     bool isMoving = false;
     float yPos = 0;
     float scaleFactor = 0;
+    int yOffset = 0;
 
     bool operator == (Fistik &obj) {
         return (color.x == obj.color.x 
@@ -141,7 +142,8 @@ void match_and_pop(int i, int j)
 
     if(count>=3){
         while(!objectsToPop.empty()){
-            auto [x,y] = objectsToPop.top();
+            auto it = objectsToPop.top();
+            int x = it.first, y = it.second;
             objectsToPop.pop();
             colorGrid[x][y].isClicked = true;
         }
@@ -173,7 +175,8 @@ void match_and_pop(int i, int j)
 
     if(count>=3){
         while(!objectsToPop.empty()){
-            auto [x,y] = objectsToPop.top();
+            auto it = objectsToPop.top();
+            int x = it.first, y = it.second;
             objectsToPop.pop();
             colorGrid[x][y].isClicked = true;
         }
