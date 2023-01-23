@@ -34,7 +34,6 @@ int gWidth = 640, gHeight = 480;
 int moves = 0, score = 0;
 bool lockPop = false;
 
-
 glm::vec3 colorArray[5] = {
     glm::vec3(0.7, 0, 0.2),
     glm::vec3(0.1, 0.8, 0.1),
@@ -184,7 +183,7 @@ void match_and_pop(int i, int j)
 
         // Check Horizontal
         count = 1;
-        if(!matched)
+        if (!matched)
             objectsToPop.push({i, j});
         for (int row = i - 1; row >= 0; row--)
         {
@@ -222,11 +221,11 @@ void match_and_pop(int i, int j)
                 ++score;
             }
         }
-        if(!matched){
+        if (!matched)
+        {
             colorGrid[i][j].isClicked = true;
             ++score;
         }
-        
     }
 }
 
@@ -788,7 +787,7 @@ void addNewObject(int x, int offset)
 
 void display(GLFWwindow *window)
 {
-    cout <<"Score: "<< score << endl;
+    cout << "Score: " << score << endl;
     updateObjectPosition();
     float scale = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2;
 
@@ -836,7 +835,8 @@ void display(GLFWwindow *window)
 
     assert(glGetError() == GL_NO_ERROR);
 
-    renderText("CENG 477 - 2022", 0, 0, 1, glm::vec3(0, 1, 1));
+    std::string movesAndScore = std::string("Moves: ") + std::to_string(moves) + "    Score: " + std::to_string(score);
+    renderText(movesAndScore, 0, 0, 1, glm::vec3(0, 1, 1));
 
     assert(glGetError() == GL_NO_ERROR);
 
