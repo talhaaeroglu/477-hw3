@@ -29,6 +29,7 @@ GLuint gProgram[4];
 GLint gIntensityLoc;
 float gIntensity = 1000;
 int gWidth = 640, gHeight = 480;
+bool lockPop = false;
 int grid_width, grid_height;
 glm::vec3 colorArray[5] = {
     glm::vec3(0.7, 0, 0.2),
@@ -128,89 +129,92 @@ void match_and_pop(int i, int j)
     // Check Vertical
     int count = 1;
     Fistik popObj = colorGrid[i][j];
-    for (int col = j - 1; col >= 0; col--)
+    if (!lockPop)
     {
-        Fistik currObj = colorGrid[i][col];
-        if (currObj == popObj)
+        for (int col = j - 1; col >= 0; col--)
         {
-            count++;
-            objectsToPop.push({i, col});
+            Fistik currObj = colorGrid[i][col];
+            if (currObj == popObj)
+            {
+                count++;
+                objectsToPop.push({i, col});
+            }
+            else
+                break;
         }
-        else
-            break;
-    }
 
-    for (int col = j + 1; col < grid_height; col++)
-    {
-        Fistik currObj = colorGrid[i][col];
-        if (currObj == popObj)
+        for (int col = j + 1; col < grid_height; col++)
         {
-            count++;
-            objectsToPop.push({i, col});
+            Fistik currObj = colorGrid[i][col];
+            if (currObj == popObj)
+            {
+                count++;
+                objectsToPop.push({i, col});
+            }
+            else
+                break;
         }
-        else
-            break;
-    }
 
-    if (count >= 3)
-    {
+        if (count >= 3)
+        {
 
-        int offset = 0;
+            int offset = 0;
+            while (!objectsToPop.empty())
+            {
+                auto it = objectsToPop.top();
+                int x = it.first, y = it.second;
+                objectsToPop.pop();
+                colorGrid[x][y].isClicked = true;
+                colorGrid[x][y].yOffset = offset;
+                cout << "MATCH OFFSET: " << offset << endl;
+                ++offset;
+            }
+        }
+        // IF COUNT < 2, EMPTY STACK
         while (!objectsToPop.empty())
         {
-            auto it = objectsToPop.top();
-            int x = it.first, y = it.second;
             objectsToPop.pop();
-            colorGrid[x][y].isClicked = true;
-            colorGrid[x][y].yOffset = offset;
-            cout << "MATCH OFFSET: " << offset << endl;
-            ++offset;
         }
-    }
-    // IF COUNT < 2, EMPTY STACK
-    while (!objectsToPop.empty())
-    {
-        objectsToPop.pop();
-    }
 
-    // Check Horizontal
-    count = 1;
-    for (int row = i - 1; row >= 0; row--)
-    {
-        Fistik currObj = colorGrid[row][j];
-        if (currObj == popObj)
+        // Check Horizontal
+        count = 1;
+        for (int row = i - 1; row >= 0; row--)
         {
-            count++;
-            objectsToPop.push({row, j});
+            Fistik currObj = colorGrid[row][j];
+            if (currObj == popObj)
+            {
+                count++;
+                objectsToPop.push({row, j});
+            }
+            else
+                break;
         }
-        else
-            break;
-    }
 
-    for (int row = i + 1; row < grid_width; row++)
-    {
-        Fistik currObj = colorGrid[row][j];
-        if (currObj == popObj)
+        for (int row = i + 1; row < grid_width; row++)
         {
-            count++;
-            objectsToPop.push({row, j});
+            Fistik currObj = colorGrid[row][j];
+            if (currObj == popObj)
+            {
+                count++;
+                objectsToPop.push({row, j});
+            }
+            else
+                break;
         }
-        else
-            break;
-    }
 
-    if (count >= 3)
-    {
-        while (!objectsToPop.empty())
+        if (count >= 3)
         {
-            auto it = objectsToPop.top();
-            int x = it.first, y = it.second;
-            objectsToPop.pop();
-            colorGrid[x][y].isClicked = true;
+            while (!objectsToPop.empty())
+            {
+                auto it = objectsToPop.top();
+                int x = it.first, y = it.second;
+                objectsToPop.pop();
+                colorGrid[x][y].isClicked = true;
+            }
         }
-    }
 
-    colorGrid[i][j].isClicked = true;
+        colorGrid[i][j].isClicked = true;
+    }
 }
 
 std::map<GLchar, Character> Characters;
@@ -735,6 +739,7 @@ void moveObjectsDown(int i, int j)
         colorGrid[i][k] = colorGrid[i][k - 1];
         colorGrid[i][k].original_j = k;
         colorGrid[i][k].isMoving = true;
+        lockPop = true;
     }
 }
 void updateObjectPosition()
@@ -749,6 +754,7 @@ void updateObjectPosition()
                 if (colorGrid[i][j].yPos <= (10 - colorGrid[i][j].original_j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height))))
                 {
                     colorGrid[i][j].isMoving = false;
+                    lockPop = false;
                 }
             }
         }
