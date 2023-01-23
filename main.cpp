@@ -754,7 +754,7 @@ void updateObjectPosition()
         }
     }
 }
-void addNewObject(int x, int offset)
+
 void addNewObject(int x, int offset)
 {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
