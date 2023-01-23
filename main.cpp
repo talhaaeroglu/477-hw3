@@ -170,7 +170,6 @@ void match_and_pop(int i, int j)
                 objectsToPop.pop();
                 colorGrid[x][y].isClicked = true;
                 colorGrid[x][y].yOffset = offset;
-                cout << "MATCH OFFSET: " << offset << endl;
                 ++offset;
                 ++score;
             }
@@ -518,21 +517,7 @@ void initVBO()
         vertexData[3 * i] = gVertices[i].x;
         vertexData[3 * i + 1] = gVertices[i].y;
         vertexData[3 * i + 2] = gVertices[i].z;
-
-        minX = std::min(minX, gVertices[i].x);
-        maxX = std::max(maxX, gVertices[i].x);
-        minY = std::min(minY, gVertices[i].y);
-        maxY = std::max(maxY, gVertices[i].y);
-        minZ = std::min(minZ, gVertices[i].z);
-        maxZ = std::max(maxZ, gVertices[i].z);
     }
-
-    std::cout << "minX = " << minX << std::endl;
-    std::cout << "maxX = " << maxX << std::endl;
-    std::cout << "minY = " << minY << std::endl;
-    std::cout << "maxY = " << maxY << std::endl;
-    std::cout << "minZ = " << minZ << std::endl;
-    std::cout << "maxZ = " << maxZ << std::endl;
 
     for (int i = 0; i < gNormals.size(); ++i)
     {
@@ -787,7 +772,6 @@ void addNewObject(int x, int offset)
 
 void display(GLFWwindow *window)
 {
-    cout << "Score: " << score << endl;
     updateObjectPosition();
     float scale = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2;
 
@@ -858,9 +842,9 @@ void reshape(GLFWwindow *window, int w, int h)
 
 void constructColorArray()
 {
-    srand(time(NULL));
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    srand(seed);
     float scaleFactor = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2.;
-    cout << "test: " << scaleFactor << endl;
     std::vector<std::vector<Fistik>> temp(grid_width, std::vector<Fistik>(grid_height));
     for (int i = 0; i < grid_width; i++)
     {
