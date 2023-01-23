@@ -19,7 +19,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <ft2build.h>
 #include <chrono>
-#include<unistd.h>               // for linux 
+#include <unistd.h> // for linux 
 #include FT_FREETYPE_H
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -49,10 +49,9 @@ struct Fistik
     float scaleFactor = 0;
     int yOffset = 0;
 
-    bool operator == (Fistik &obj) {
-        return (color.x == obj.color.x 
-                && color.y == obj.color.y 
-                && color.z == obj.color.z);
+    bool operator==(Fistik &obj)
+    {
+        return (color.x == obj.color.x && color.y == obj.color.y && color.z == obj.color.z);
     }
     int original_j;
 };
@@ -112,8 +111,10 @@ struct Character
     GLuint Advance;     // Horizontal offset to advance to next glyph
 };
 
-struct ComparePair {
-    bool operator()(const std::pair<int, int>& p1, const std::pair<int, int>& p2) {
+struct ComparePair
+{
+    bool operator()(const std::pair<int, int> &p1, const std::pair<int, int> &p2)
+    {
         return p1.second < p2.second;
     }
 };
@@ -127,28 +128,36 @@ void match_and_pop(int i, int j)
     // Check Vertical
     int count = 1;
     Fistik popObj = colorGrid[i][j];
-    for (int col = j - 1; col >= 0; col--){
+    for (int col = j - 1; col >= 0; col--)
+    {
         Fistik currObj = colorGrid[i][col];
-        if (currObj == popObj){
+        if (currObj == popObj)
+        {
             count++;
-            objectsToPop.push({i,col});
-        } else
-            break;     
-    }
-
-    for (int col = j + 1; col < grid_height; col++){
-        Fistik currObj =colorGrid[i][col];
-        if (currObj  == popObj){
-            count++;
-            objectsToPop.push({i,col});
-        } else
+            objectsToPop.push({i, col});
+        }
+        else
             break;
     }
 
-    if(count>=3){
+    for (int col = j + 1; col < grid_height; col++)
+    {
+        Fistik currObj = colorGrid[i][col];
+        if (currObj == popObj)
+        {
+            count++;
+            objectsToPop.push({i, col});
+        }
+        else
+            break;
+    }
 
-        int offset = 0;        
-        while(!objectsToPop.empty()){
+    if (count >= 3)
+    {
+
+        int offset = 0;
+        while (!objectsToPop.empty())
+        {
             auto it = objectsToPop.top();
             int x = it.first, y = it.second;
             objectsToPop.pop();
@@ -159,32 +168,41 @@ void match_and_pop(int i, int j)
         }
     }
     // IF COUNT < 2, EMPTY STACK
-    while (!objectsToPop.empty()){
+    while (!objectsToPop.empty())
+    {
         objectsToPop.pop();
     }
 
     // Check Horizontal
     count = 1;
-    for (int row = i - 1; row >= 0; row--){
+    for (int row = i - 1; row >= 0; row--)
+    {
         Fistik currObj = colorGrid[row][j];
-        if (currObj == popObj){
+        if (currObj == popObj)
+        {
             count++;
-            objectsToPop.push({row,j});
-        } else
+            objectsToPop.push({row, j});
+        }
+        else
             break;
     }
 
-    for (int row = i + 1; row < grid_width; row++){
-        Fistik currObj =colorGrid[row][j];
-        if (currObj  == popObj){
+    for (int row = i + 1; row < grid_width; row++)
+    {
+        Fistik currObj = colorGrid[row][j];
+        if (currObj == popObj)
+        {
             count++;
-            objectsToPop.push({row,j});
-        }else
+            objectsToPop.push({row, j});
+        }
+        else
             break;
     }
 
-    if(count>=3){
-        while(!objectsToPop.empty()){
+    if (count >= 3)
+    {
+        while (!objectsToPop.empty())
+        {
             auto it = objectsToPop.top();
             int x = it.first, y = it.second;
             objectsToPop.pop();
@@ -193,7 +211,6 @@ void match_and_pop(int i, int j)
     }
 
     colorGrid[i][j].isClicked = true;
-
 }
 
 std::map<GLchar, Character> Characters;
@@ -704,7 +721,7 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 
         if (norm_x > -9 && norm_x < 9 && norm_y > -9 && norm_y < 9 && grid_x < grid_width && grid_y < grid_height)
         {
-            
+
             std::cout << "Clicked object x: " << grid_x << std::endl;
             std::cout << "Clicked object y: " << grid_y << std::endl;
             match_and_pop(grid_x, grid_y);
@@ -737,6 +754,7 @@ void updateObjectPosition()
         }
     }
 }
+void addNewObject(int x, int offset)
 void addNewObject(int x, int offset)
 {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -797,7 +815,7 @@ void display(GLFWwindow *window)
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "modelingMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "modelingMatInvTr"), 1, GL_FALSE, glm::value_ptr(modelMatInv));
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "orthoMat"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-            if ( colorGrid[i][j].show && !(colorGrid[i][j].isClicked && colorGrid[i][j].scaleFactor >= (1.5 * scale)))
+            if (colorGrid[i][j].show && !(colorGrid[i][j].isClicked && colorGrid[i][j].scaleFactor >= (1.5 * scale)))
                 drawModel();
         }
     }
@@ -821,9 +839,6 @@ void reshape(GLFWwindow *window, int w, int h)
 
     glViewport(0, 0, w, h);
 }
-
-
-
 
 void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
