@@ -28,9 +28,9 @@ using namespace std;
 GLuint gProgram[4];
 GLint gIntensityLoc;
 
-float gIntensity = 1000;
+float gIntensity = 500;
 int grid_width, grid_height;
-int gWidth = 640, gHeight = 480;
+int gWidth = 640, gHeight = 600;
 int moves = 0, score = 0;
 bool lockPop = false;
 
@@ -226,6 +226,7 @@ void match_and_pop(int i, int j)
             colorGrid[i][j].isClicked = true;
             ++score;
         }
+        ++moves;
     }
 }
 
@@ -740,7 +741,6 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
             std::cout << "Clicked object x: " << grid_x << std::endl;
             std::cout << "Clicked object y: " << grid_y << std::endl;
             match_and_pop(grid_x, grid_y);
-            ++moves;
         }
     }
 }
@@ -762,7 +762,7 @@ void updateObjectPosition()
         {
             if (colorGrid[i][j].isMoving == true)
             {
-                colorGrid[i][j].yPos -= 0.05;
+                colorGrid[i][j].yPos -= 0.4;
                 if (colorGrid[i][j].yPos <= (10 - colorGrid[i][j].original_j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height))))
                 {
                     colorGrid[i][j].isMoving = false;
@@ -805,6 +805,7 @@ void display(GLFWwindow *window)
         {
             if (colorGrid[i][j].isClicked == true && colorGrid[i][j].scaleFactor < (1.5 * scale))
             {
+                lockPop = true;
                 colorGrid[i][j].scaleFactor += 0.01;
             }
             if (colorGrid[i][j].isClicked == true && colorGrid[i][j].scaleFactor >= (1.5 * scale))
@@ -813,6 +814,7 @@ void display(GLFWwindow *window)
                 moveObjectsDown(i, j);
                 addNewObject(i, offset);
                 colorGrid[i][j].isClicked = false;
+
                 // move down the objects above the empty space
             }
             glm::mat4 T = glm::translate(glm::mat4(1.f), glm::vec3((i) * (18. / grid_width) - 10 + 1 + (18. / ((2) * (grid_width))), colorGrid[i][j].yPos, -10.f));
