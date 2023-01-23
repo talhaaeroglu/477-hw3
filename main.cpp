@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cassert>
 #include <cstdlib>
+#include <queue>
 #include <cstring>
 #include <string>
 #include <stack>
@@ -111,12 +112,17 @@ struct Character
     GLuint Advance;     // Horizontal offset to advance to next glyph
 };
 
+struct ComparePair {
+    bool operator()(const std::pair<int, int>& p1, const std::pair<int, int>& p2) {
+        return p1.second < p2.second;
+    }
+};
 
 void match_and_pop(int i, int j)
 {
 
-    std::stack<std::pair<int,int>> objectsToPop;
-
+    std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, ComparePair> objectsToPop;
+    objectsToPop.push({i, j});
 
     // Check Vertical
     int count = 1;
@@ -141,11 +147,15 @@ void match_and_pop(int i, int j)
     }
 
     if(count>=3){
+
+        int offset = 0;        
         while(!objectsToPop.empty()){
             auto it = objectsToPop.top();
             int x = it.first, y = it.second;
             objectsToPop.pop();
             colorGrid[x][y].isClicked = true;
+            colorGrid[x][y].yOffset = offset;
+            ++offset;
         }
     }
     // IF COUNT < 2, EMPTY STACK
@@ -181,6 +191,9 @@ void match_and_pop(int i, int j)
             colorGrid[x][y].isClicked = true;
         }
     }
+
+    colorGrid[i][j].isClicked = true;
+
 }
 
 std::map<GLchar, Character> Characters;
@@ -691,10 +704,9 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 
         if (norm_x > -9 && norm_x < 9 && norm_y > -9 && norm_y < 9 && grid_x < grid_width && grid_y < grid_height)
         {
-            colorGrid[grid_x][grid_y].isClicked = true;
+            
             std::cout << "Clicked object x: " << grid_x << std::endl;
             std::cout << "Clicked object y: " << grid_y << std::endl;
-            match_and_pop(grid_x, grid_y);
             match_and_pop(grid_x, grid_y);
         }
     }
@@ -762,6 +774,7 @@ void display(GLFWwindow *window)
             }
             if (colorGrid[i][j].isClicked == true && colorGrid[i][j].scaleFactor >= (1.5 * scale))
             {
+                cout << colorGrid[i][j].yOffset << endl;
                 moveObjectsDown(i, j);
                 addNewObject(i);
                 colorGrid[i][j].isClicked = false;
