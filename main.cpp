@@ -4,6 +4,7 @@
 #include <cstring>
 #include <string>
 #include <stack>
+#include <stack>
 #include <map>
 #include <fstream>
 #include <iostream>
@@ -42,12 +43,20 @@ struct Fistik
     int colorId;
     bool isClicked = false;
     bool show = true;
+    bool isMoving = false;
+    float yPos = 0;
     float scaleFactor = 0;
 
     bool operator == (Fistik &obj) {
         return (color.x == obj.color.x 
                 && color.y == obj.color.y 
                 && color.z == obj.color.z);
+    }
+    int original_j;
+
+    bool operator==(Fistik &obj)
+    {
+        return (color.x == obj.color.x && color.y == obj.color.y && color.z == obj.color.z);
     }
 };
 
@@ -688,13 +697,51 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
             std::cout << "Clicked object x: " << grid_x << std::endl;
             std::cout << "Clicked object y: " << grid_y << std::endl;
             match_and_pop(grid_x, grid_y);
+            match_and_pop(grid_x, grid_y);
         }
     }
+}
+void moveObjectsDown(int i, int j)
+{
+    for (int k = j; k > 0; k--)
+    {
+        colorGrid[i][k] = colorGrid[i][k - 1];
+        colorGrid[i][k].original_j = k;
+        colorGrid[i][k].isMoving = true;
+    }
+}
+void updateObjectPosition()
+{
+    for (int i = 0; i < grid_width; i++)
+    {
+        for (int j = 0; j < grid_height; j++)
+        {
+            if (colorGrid[i][j].isMoving == true)
+            {
+                colorGrid[i][j].yPos -= 0.05;
+                if (colorGrid[i][j].yPos <= (10 - colorGrid[i][j].original_j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height))))
+                {
+                    colorGrid[i][j].isMoving = false;
+                }
+            }
+        }
+    }
+}
+void addNewObject(int x)
+{
+    srand(time(NULL));
+    float scaleFactor = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2.;
+    glm::vec3 color = colorArray[rand() % 5];
+    colorGrid[x][0].color = color;
+    colorGrid[x][0].yPos = 10; // start position
+    colorGrid[x][0].isClicked = false;
+    colorGrid[x][0].isMoving = true;
+    colorGrid[x][0].scaleFactor = scaleFactor;
 }
 
 void display(GLFWwindow *window)
 {
-
+    updateObjectPosition();
     float scale = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2;
 
     glClearColor(0, 0, 0, 1);
@@ -713,7 +760,15 @@ void display(GLFWwindow *window)
             {
                 colorGrid[i][j].scaleFactor += 0.01;
             }
-            glm::mat4 T = glm::translate(glm::mat4(1.f), glm::vec3((i) * (18. / grid_width) - 10 + 1 + (18. / ((2) * (grid_width))), 10 - j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height)), -10.f));
+            if (colorGrid[i][j].isClicked == true && colorGrid[i][j].scaleFactor >= (1.5 * scale))
+            {
+                moveObjectsDown(i, j);
+                addNewObject(i);
+                colorGrid[i][j].isClicked = false;
+                // move down the objects above the empty space
+            }
+            glm::mat4 T = glm::translate(glm::mat4(1.f), glm::vec3((i) * (18. / grid_width) - 10 + 1 + (18. / ((2) * (grid_width))), colorGrid[i][j].yPos, -10.f));
+            // glm::mat4 T = glm::translate(glm::mat4(1.f), glm::vec3((i) * (18. / grid_width) - 10 + 1 + (18. / ((2) * (grid_width))), 10 - j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height)), -10.f));
             glm::mat4 R = glm::rotate(glm::mat4(1.f), glm::radians(angle), glm::vec3(0, 1, 0));
             glm::mat4 S = glm::scale(glm::mat4(1.f), glm::vec3(colorGrid[i][j].scaleFactor, colorGrid[i][j].scaleFactor, colorGrid[i][j].scaleFactor));
             glm::mat4 modelMat = T * R * S;
@@ -822,6 +877,7 @@ void constructColorArray()
             glm::vec3 color = colorArray[rand() % 5];
             temp[i][j].color = color;
             temp[i][j].scaleFactor = scaleFactor;
+            temp[i][j].yPos = 10 - j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height));
         }
     }
 
