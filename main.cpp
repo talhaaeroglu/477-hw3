@@ -28,7 +28,7 @@ using namespace std;
 GLuint gProgram[4];
 GLint gIntensityLoc;
 
-float gIntensity = 200;
+float gIntensity = 100;
 int grid_width, grid_height;
 int gWidth = 640, gHeight = 600;
 int moves = 0, score = 0;
@@ -805,6 +805,7 @@ void display(GLFWwindow *window)
 
                 // move down the objects above the empty space
             }
+            glm::vec3 light = glm::vec3((i) * (18. / grid_width) - 10 + 1 + (18. / ((2) * (grid_width))), colorGrid[i][j].yPos, 1.f);
             glm::mat4 T = glm::translate(glm::mat4(1.f), glm::vec3((i) * (18. / grid_width) - 10 + 1 + (18. / ((2) * (grid_width))), colorGrid[i][j].yPos, -10.f));
             // glm::mat4 T = glm::translate(glm::mat4(1.f), glm::vec3((i) * (18. / grid_width) - 10 + 1 + (18. / ((2) * (grid_width))), 10 - j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height)), -10.f));
             glm::mat4 R = glm::rotate(glm::mat4(1.f), glm::radians(angle), glm::vec3(0, 1, 0));
@@ -814,6 +815,7 @@ void display(GLFWwindow *window)
             glm::mat4 projectionMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -20.0f, 20.0f);
             glm::vec3 color = colorGrid[i][j].color;
 
+            glUniform3f(glGetUniformLocation(gProgram[0], "lightPos"), light.x, light.y, light.z);
             glUniform3f(glGetUniformLocation(gProgram[0], "kd"), color.x, color.y, color.z);
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "modelingMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
             glUniformMatrix4fv(glGetUniformLocation(gProgram[0], "modelingMatInvTr"), 1, GL_FALSE, glm::value_ptr(modelMatInv));

@@ -1,6 +1,6 @@
 #version 120 
 
-vec3 lightPos = vec3(5, 5, 5);
+uniform vec3 lightPos;
 vec3 eyePos = vec3(0, 0, 0);
 
 uniform float intensity;
