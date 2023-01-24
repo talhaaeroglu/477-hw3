@@ -49,6 +49,7 @@ struct Fistik
     bool isClicked = false;
     bool show = true;
     bool isMoving = false;
+    bool isVisited = false;
     float yPos = 0;
     float scaleFactor = 0;
     int yOffset = 0;
@@ -125,7 +126,6 @@ struct ComparePair
 
 void match_and_pop(int i, int j, bool click = false)
 {
-
     std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, ComparePair> objectsToPop;
     objectsToPop.push({i, j});
     bool matched = false;
@@ -171,7 +171,10 @@ void match_and_pop(int i, int j, bool click = false)
                 colorGrid[x][y].isClicked = true;
                 colorGrid[x][y].yOffset = offset;
                 ++offset;
-                ++score;
+                if(!colorGrid[x][y].isVisited){
+                     ++score;
+                     colorGrid[x][y].isVisited = true;
+                }
             }
         }
         // IF COUNT < 2, EMPTY STACK
@@ -217,7 +220,10 @@ void match_and_pop(int i, int j, bool click = false)
                 int x = it.first, y = it.second;
                 objectsToPop.pop();
                 colorGrid[x][y].isClicked = true;
-                ++score;
+                if(!colorGrid[x][y].isVisited){
+                     ++score;
+                     colorGrid[x][y].isVisited = true;
+                }
             }
         }
         if (click)
@@ -748,7 +754,6 @@ void updateObjectPosition()
     {
         for (int j = 0; j < grid_height; j++)
         {
-            match_and_pop(i, j);
             if (colorGrid[i][j].isMoving == true)
             {
                 colorGrid[i][j].yPos -= 0.4;
@@ -761,6 +766,12 @@ void updateObjectPosition()
         }
     }
 }
+void matchAllGrid()
+{
+    for (int i = 0; i < grid_width; i++)
+    for (int j = 0; j < grid_height; j++)
+    match_and_pop(i, j);
+}
 void addNewObject(int x, int offset)
 {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -772,6 +783,7 @@ void addNewObject(int x, int offset)
     colorGrid[x][0].isClicked = false;
     colorGrid[x][0].isMoving = true;
     colorGrid[x][0].scaleFactor = scaleFactor;
+    colorGrid[x][0].isVisited = false;
 }
 
 void display(GLFWwindow *window)
@@ -802,7 +814,6 @@ void display(GLFWwindow *window)
                 moveObjectsDown(i, j);
                 addNewObject(i, offset);
                 colorGrid[i][j].isClicked = false;
-
                 // move down the objects above the empty space
             }
             glm::vec3 light = glm::vec3((i) * (18. / grid_width) - 10 + 1 + (18. / ((2) * (grid_width))), colorGrid[i][j].yPos, 1.f);
@@ -824,6 +835,7 @@ void display(GLFWwindow *window)
                 drawModel();
         }
     }
+    
 
     assert(glGetError() == GL_NO_ERROR);
 
@@ -833,6 +845,7 @@ void display(GLFWwindow *window)
     assert(glGetError() == GL_NO_ERROR);
 
     angle += 0.5;
+    matchAllGrid();
 }
 
 void reshape(GLFWwindow *window, int w, int h)
