@@ -129,7 +129,6 @@ void match_and_pop(int i, int j, bool click = false)
     std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, ComparePair> objectsToPop;
     objectsToPop.push({i, j});
     bool matched = false;
-
     // Check Vertical
     int count = 1;
     Fistik popObj = colorGrid[i][j];
@@ -873,6 +872,9 @@ void constructColorArray()
             temp[i][j].color = color;
             temp[i][j].scaleFactor = scaleFactor;
             temp[i][j].yPos = 10 - j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height));
+            temp[i][j].isClicked = false;
+            temp[i][j].isVisited = false;
+            temp[i][j].yOffset = 0;
         }
     }
 
@@ -888,6 +890,7 @@ void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods)
     else if (key == GLFW_KEY_R && action == GLFW_PRESS)
     {
         cout << "R pressed" << endl;
+        lockPop = false;
         moves = 0;
         score = 0;
         constructColorArray();
