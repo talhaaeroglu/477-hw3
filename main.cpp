@@ -123,7 +123,7 @@ struct ComparePair
     }
 };
 
-void match_and_pop(int i, int j)
+void match_and_pop(int i, int j, bool click = false)
 {
 
     std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, ComparePair> objectsToPop;
@@ -220,12 +220,14 @@ void match_and_pop(int i, int j)
                 ++score;
             }
         }
-        if (!matched)
-        {
-            colorGrid[i][j].isClicked = true;
-            ++score;
+        if(click){
+            ++moves;
+            if(!matched){
+                colorGrid[i][j].isClicked = true;
+                ++score;
+            }
         }
-        ++moves;
+       
     }
 }
 
@@ -745,6 +747,7 @@ void updateObjectPosition()
     {
         for (int j = 0; j < grid_height; j++)
         {
+            match_and_pop(i, j);
             if (colorGrid[i][j].isMoving == true)
             {
                 colorGrid[i][j].yPos -= 0.4;
