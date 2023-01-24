@@ -874,6 +874,7 @@ void constructColorArray()
             temp[i][j].yPos = 10 - j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height));
             temp[i][j].isClicked = false;
             temp[i][j].isVisited = false;
+            temp[i][j].isMoving = false;
             temp[i][j].yOffset = 0;
         }
     }
