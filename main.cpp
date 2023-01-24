@@ -727,7 +727,7 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
         {
             std::cout << "Clicked object x: " << grid_x << std::endl;
             std::cout << "Clicked object y: " << grid_y << std::endl;
-            match_and_pop(grid_x, grid_y);
+            match_and_pop(grid_x, grid_y, true);
         }
     }
 }
