@@ -28,14 +28,14 @@ using namespace std;
 GLuint gProgram[4];
 GLint gIntensityLoc;
 
-float gIntensity = 500;
+float gIntensity = 200;
 int grid_width, grid_height;
 int gWidth = 640, gHeight = 600;
 int moves = 0, score = 0;
 bool lockPop = false;
 
 glm::vec3 colorArray[5] = {
-    glm::vec3(0.7, 0, 0.2),
+    glm::vec3(1, 0.2, 0.6),
     glm::vec3(0.1, 0.8, 0.1),
     glm::vec3(0.1, 0.8, 0.8),
     glm::vec3(0.1, 0.1, 0.8),
@@ -220,14 +220,15 @@ void match_and_pop(int i, int j, bool click = false)
                 ++score;
             }
         }
-        if(click){
+        if (click)
+        {
             ++moves;
-            if(!matched){
+            if (!matched)
+            {
                 colorGrid[i][j].isClicked = true;
                 ++score;
             }
         }
-       
     }
 }
 
