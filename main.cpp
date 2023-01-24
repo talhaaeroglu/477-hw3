@@ -170,9 +170,10 @@ void match_and_pop(int i, int j, bool click = false)
                 colorGrid[x][y].isClicked = true;
                 colorGrid[x][y].yOffset = offset;
                 ++offset;
-                if(!colorGrid[x][y].isVisited){
-                     ++score;
-                     colorGrid[x][y].isVisited = true;
+                if (!colorGrid[x][y].isVisited)
+                {
+                    ++score;
+                    colorGrid[x][y].isVisited = true;
                 }
             }
         }
@@ -219,9 +220,10 @@ void match_and_pop(int i, int j, bool click = false)
                 int x = it.first, y = it.second;
                 objectsToPop.pop();
                 colorGrid[x][y].isClicked = true;
-                if(!colorGrid[x][y].isVisited){
-                     ++score;
-                     colorGrid[x][y].isVisited = true;
+                if (!colorGrid[x][y].isVisited)
+                {
+                    ++score;
+                    colorGrid[x][y].isVisited = true;
                 }
             }
         }
@@ -739,43 +741,50 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 }
 void moveObjectsDown(int i, int j)
 {
+    lockPop = true;
     for (int k = j; k > 0; k--)
     {
         colorGrid[i][k] = colorGrid[i][k - 1];
         colorGrid[i][k].original_j = k;
         colorGrid[i][k].isMoving = true;
-        lockPop = true;
     }
 }
 void updateObjectPosition()
 {
+    lockPop = true;
+    int x = 0;
     for (int i = 0; i < grid_width; i++)
     {
         for (int j = 0; j < grid_height; j++)
         {
             if (colorGrid[i][j].isMoving == true)
             {
-                colorGrid[i][j].yPos -= 0.4;
+                x = 1;
+                colorGrid[i][j].yPos -= 0.1;
                 if (colorGrid[i][j].yPos <= (10 - colorGrid[i][j].original_j * (18. / grid_height) - 1 - 18. / ((2) * (grid_height))))
                 {
                     colorGrid[i][j].isMoving = false;
-                    lockPop = false;
                 }
             }
         }
     }
+    if (x == 0)
+        lockPop = false;
 }
 void matchAllGrid()
 {
     for (int i = 0; i < grid_width; i++)
-    for (int j = 0; j < grid_height; j++)
-    match_and_pop(i, j);
+        for (int j = 0; j < grid_height; j++)
+            match_and_pop(i, j);
 }
 void addNewObject(int x, int offset)
 {
+    cout << "-----------" << endl;
+    cout << x << endl;
+    cout << offset << endl;
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     srand(seed);
-    float scaleFactor = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2.;
+    float scaleFactor = min(1.0f * (7.0f / grid_width), 1.0f * (7.0f / grid_height)) / 2.;
     glm::vec3 color = colorArray[rand() % 5];
     colorGrid[x][0].color = color;
     colorGrid[x][0].yPos = 10 + offset * (18. / grid_height);
@@ -788,7 +797,7 @@ void addNewObject(int x, int offset)
 void display(GLFWwindow *window)
 {
     updateObjectPosition();
-    float scale = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2;
+    float scale = min(1.0f * (7.0f / grid_width), 1.0f * (7.0f / grid_height)) / 2;
 
     glClearColor(0, 0, 0, 1);
     glClearDepth(1.0f);
@@ -810,9 +819,10 @@ void display(GLFWwindow *window)
             if (colorGrid[i][j].isClicked == true && colorGrid[i][j].scaleFactor >= (1.5 * scale))
             {
                 int offset = colorGrid[i][j].yOffset;
+                colorGrid[i][j].isClicked = false;
                 moveObjectsDown(i, j);
                 addNewObject(i, offset);
-                colorGrid[i][j].isClicked = false;
+
                 // move down the objects above the empty space
             }
             glm::vec3 light = glm::vec3((i) * (18. / grid_width) - 10 + 1 + (18. / ((2) * (grid_width))), colorGrid[i][j].yPos, 1.f);
@@ -834,7 +844,6 @@ void display(GLFWwindow *window)
                 drawModel();
         }
     }
-    
 
     assert(glGetError() == GL_NO_ERROR);
 
@@ -862,7 +871,7 @@ void constructColorArray()
 {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     srand(seed);
-    float scaleFactor = min(1.0f * (5.0f / grid_width), 1.0f * (5.0f / grid_height)) / 2.;
+    float scaleFactor = min(1.0f * (7.0f / grid_width), 1.0f * (7.0f / grid_height)) / 2.;
     std::vector<std::vector<Fistik>> temp(grid_width, std::vector<Fistik>(grid_height));
     for (int i = 0; i < grid_width; i++)
     {
