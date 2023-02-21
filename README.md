@@ -1,7 +1,7 @@
 
 # Bunny Crush Game
 
-The game was written by @talhaaeroglu, @senyuzilgaz using OPENGL and glfw, glu, glew libraries
+The game was written by [@talhaaeroglu](https://www.github.com/talhaaeroglu) and[@senyuzilgaz](https://www.github.com/senyuzilgaz) using OPENGL and glfw, glu, glew libraries.
 
 In this game, the game board will be presented with a grid of bunnies, each with a different color.\
 If there are three or more bunnies of the same color in a row or column, they will explode and new
