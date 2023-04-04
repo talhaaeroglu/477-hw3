@@ -10,7 +10,7 @@ manually cause them to explode, and the game will keep track of the number of mo
 has made. The player’s score will only be counted for bunnies that are exploded as part of a match.
 
 ## Game
-Please wait for Gif.
+Please wait for Gif.\
 ![](https://github.com/talhaaeroglu/477-hw3/blob/main/477hw3.gif)
 
 ## Installation
